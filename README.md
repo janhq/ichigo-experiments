@@ -11,8 +11,8 @@
 [**About**](#about) | [**Demo**](#demo) | [**Progress**](#progress) | [**Data Pipeline**](#synthetic-generation) | [**Training**](#training-with-torchtune)
 
 
-  <img src="images/ichigov0.2.jpeg" width="400"/>
-  <p><small>Homebrewed early-fusion speech model</a></small></p>
+  <img src="images/whisperichigo.jpg" width="400"/>
+  <p><small>Homebrewed early-fusion speech model and ASR model</a></small></p>
 </div>
 
 > [!NOTE]  
@@ -79,7 +79,6 @@ python -m demo.app_vllm
 
 ## Data Synthetic and Training Instruction
 
-
 ###  Synthetic Generation
 
 For detailed information on synthetic generation, please refer to the [Synthetic Generation Guide](synthetic_data/README.md).
@@ -98,7 +97,7 @@ Ichigo
         ├── audio_to_audio                   # Parler audio (.wav) to semantic tokens
         ├── synthetic_generation_config      # TTS semantic tokens
 ├── scripts                                  # Setup scripts for Runpod
-├── torchtune                                # Submodule: our fork of fsdp with checkpointing
+├── torchtune                                # Submodule for training Ichigo
 ├── model_zoo                                # Model checkpoints
 │   ├── LLM
 │   │   ├── Meta-Llama-3-8B-Instruct
