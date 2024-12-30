@@ -1,6 +1,6 @@
 <div align="center">
 
-# :strawberry: Ichigo: Local real-time voice AI (Formerly llama3-s).
+# :strawberry: Ichigo and 🍰 Ichigo-Whisper.
 <a href='https://homebrew.ltd/blog/llama3-just-got-ears'><img src='https://img.shields.io/badge/Project-Blog-Green'></a>
 <a href='https://ichigo.homebrew.ltd/'><img src='https://img.shields.io/badge/Project-Demo-violet'></a>
 <a href='https://arxiv.org/pdf/2410.15316'><img src='https://img.shields.io/badge/Paper-Arxiv-red'></a>
@@ -16,13 +16,12 @@
 </div>
 
 > [!NOTE]  
-> Update: September 30, 2024
-> - We have rebranded from llama3-s to :strawberry: Ichigo.
-> - Our custom-built early-fusion speech model now has a name and a voice.
-> - It has improved multiturn capabilities and can now refuse to process inaudible queries.
+> Update: December 30, 2024
+> - Released Ichigo-Whisper v0.1: a 22M-parameter quantizer built on Whisper Medium for Vietnamese and English.
+> - Open-source, optimized for low-resource languages, using discrete tokens for LLM integration and advanced speech understanding.
 
 > [!WARNING]  
-> :strawberry: Ichigo is an open research experiment
+> :strawberry: Ichigo and 🍰 Ichigo-Whisper are open research experiments
 > - Join us in the  `#research` channel in [Homebrew's Discord](https://discord.com/invite/FTk2MvZwJH)
 > - We livestream training runs in `#research-livestream`
 
@@ -35,6 +34,12 @@ We ~~build~~ train in public:
 - [Ichigo v0.3 Checkpoint Writeup](https://homebrew.ltd/blog/llama-learns-to-talk)
 - [Ichigo v0.2 Checkpoint Writeup](https://homebrew.ltd/blog/llama3-just-got-ears)
 - [Ichigo v0.1 Checkpoint Writeup](https://homebrew.ltd/blog/can-llama-3-listen)
+
+## Architecture
+<div align="center">
+      <img src="images/ichigo-arch.png" width="550"/>
+      <p><small>Overview architecture</a></small></p>
+</div>
 
 ## Demo
 ### WebUI
@@ -61,6 +66,7 @@ python -m demo.app_vllm
 **Alternatively, you can easily try our demo on [HuggingFace](https://huggingface.co/spaces/jan-hq/Llama3.1-s-v0.2) 🤗**
 
 ## Progress
+- 30 Dec: [Ichigo Whisper](https://huggingface.co/homebrewltd/Ichigo-whisper-v0.1) is now available. It is a lightweight (22M parameters), open-source quantizer built on top of Whisper Medium, designed to optimize performance for low-resource languages while maintaining strong English capabilities. Unlike continuous embedding models, Ichigo Whisper compresses speech into discrete tokens, enabling seamless integration with large language models (LLMs) for advanced speech understanding.
 - 11 Nov: [Ichigo v0.4](https://huggingface.co/collections/homebrewltd/ichigo-v04-67317bde6dfdfdd55dddbc6e) models are now available. This update introduces a unified training pipeline by consolidating Phases 2 and 3, with training data enhancements that include migrating speech noise and multi-turn data to Phase 2 and adding synthetic noise-augmented multi-turn conversations. Achieving an improved MMLU score of 64.63, the model now boasts stronger context handling, advanced noise management, and enhanced multi-turn capabilities for a more robust and responsive user experience.
 - 22 Oct: 📑 Research Paper Release: We are pleased to announce the publication of our research paper detailing the development and technical innovations behind Ichigo series. The full technical details, methodology, and experimental results are now available in our [paper](https://arxiv.org/pdf/2410.15316). 
 - 4 Oct: [Ichigo v0.3](https://huggingface.co/collections/homebrewltd/ichigo-66ffc7484ef31ec5596ef6d0) models are now available. Utilizing cleaner and improved data, our model has achieved an enhanced MMLU score of 63.79 and demonstrates stronger speech instruction-following capabilities, even in multi-turn interactions. Additionally, by incorporating noise-synthetic data, we have successfully trained the model to refuse processing non-speech audio inputs from users, further improving its functionality and user experience.
@@ -87,7 +93,6 @@ git clone --recurse-submodules https://github.com/homebrewltd/ichigo.git
 2. The folder structure is as follows:
 ```
 Ichigo
-├── HF_Trainer                               # HF training code (deprecated)
 ├── synthetic_data                           # Synthetic data generation pipeline
     ├── configs                              # Audio pipeline configs
         ├── audio_to_audio                   # Parler audio (.wav) to semantic tokens
@@ -100,30 +105,6 @@ Ichigo
 │   │   ├── Meta-Llama-3-70B-Instruct
 ├── demo                                     # Selfhost this demo (vllm)
 ├── inference                                # Google Colab
-```
-
-### Training with HF Trainer (Deprecated) 
-1. Install Dependencies
-```
-python -m venv hf_trainer
-chmod +x scripts/install.sh
-./scripts/install.sh
-```
-Restart shell now
-```
-chmod +x scripts/setup.sh
-./scripts/setup.sh
-source myenv/bin/activate
-```
-2. Logging Huggingface
-```
-huggingface-cli login --token=<token>
-```
-3. Training
-```
-export CUTLASS_PATH="cutlass"
-export CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7
-accelerate launch --config_file ./accelerate_config.yaml train.py 
 ```
 
 ### Training with Torchtune
@@ -234,7 +215,8 @@ accelerate launch --config_file ./accelerate_config.yaml train.py
 ```
 ## Join Us
 
-:strawberry: Ichigo is an open research project. We're looking for collaborators, and will likely move towards crowdsourcing speech datasets in the future. 
+:strawberry: Ichigo and 🍰 Ichigo-Whisper is an open research project. We're looking for collaborators, and will likely move towards crowdsourcing speech datasets in the future.
+
 ## Acknowledgement
 
 - [Torchtune](https://github.com/pytorch/torchtune): The codebase we built upon
