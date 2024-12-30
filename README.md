@@ -92,18 +92,15 @@ git clone --recurse-submodules https://github.com/homebrewltd/ichigo.git
 2. The folder structure is as follows:
 ```
 Ichigo
-├── synthetic_data                           # Synthetic data generation pipeline
-    ├── configs                              # Audio pipeline configs
-        ├── audio_to_audio                   # Parler audio (.wav) to semantic tokens
-        ├── synthetic_generation_config      # TTS semantic tokens
-├── scripts                                  # Setup scripts for Runpod
-├── torchtune                                # Submodule for training Ichigo
-├── model_zoo                                # Model checkpoints
-│   ├── LLM
-│   │   ├── Meta-Llama-3-8B-Instruct
-│   │   ├── Meta-Llama-3-70B-Instruct
-├── demo                                     # Selfhost this demo (vllm)
-├── inference                                # Google Colab
+├── demo                                     # Gradio demo
+├── images                                   # Project images and assets
+├── inference                                # Inference code
+├── latency_testing                          # Benchmarking code
+├── scripts                                  # Gradio demo and utility scripts
+├── synthetic_data                           # Data generation and torch_compile debugging
+├── external                                 # External dependencies
+   ├── ichigo-whisper                       # WhisperSpeech/ichigo-whisper submodule
+   └── torchtune                            # Training utilities submodule
 ```
 
 ### Training with Torchtune
