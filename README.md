@@ -37,7 +37,7 @@ We ~~build~~ train in public:
 
 ## Architecture
 <div align="center">
-      <img src="images/ichigo-arch.png" width="550"/>
+      <img src="images/ichigo-architecture.png" width="550"/>
       <p><small>Overview architecture</a></small></p>
 </div>
 
