@@ -8,7 +8,7 @@
 <a href='https://huggingface.co/homebrewltd'><img src='https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Data-green'></a>
 <a href='https://colab.research.google.com/drive/18IiwN0AzBZaox5o0iidXqWD1xKq11XbZ?usp=sharing'><img src='https://colab.research.google.com/assets/colab-badge.svg'></a>
 
-[**About**](#about) | [**Demo**](#demo) | [**Progress**](#progress) | [**Data Pipeline**](#synthetic-generation) | [**Training**](#training-with-torchtune)
+[**About**](#about) | [**Demo**](#demo) | [**Progress**](#progress) | [**Data Pipeline**](#synthetic-generation) | [**Training**](#training-with-torchtune) | [**Ichigo-Whisper**](#ichigo-whisper)
 
 
   <img src="images/whisperichigo.jpg" width="400"/>
@@ -186,6 +186,17 @@ Ichigo
       ```
       tune run --nproc_per_node <no-gpu> full_finetune_fsdp2 --config recipes/configs/jan-llama3-1-s/finetune/8B_full.yaml
       ```
+
+## Ichigo Whisper
+
+Ichigo Whisper is a compact (22M parameters), open-source quantizer for the `Whisper-medium model`, designed to enhance performance on *low-resource languages* with minimal impact on its original English capabilities. Unlike models that output continuous embeddings, Ichigo Whisper compresses speech into discrete tokens, making it more compatible with large language models (LLMs) for immediate speech understanding.
+
+This quantized version of Whisper-medium has been trained on over ~400 hours of English data and ~1000 hours of Vietnamese data.
+
+Ichigo Whisper is a key component of the Ichigo v0.5 family.
+
+For more details, please refer to our official [Ichigo Whisper Repository](https://github.com/janhq/WhisperSpeech/tree/main/ichigo-whisper).
+
 ## References
 ```bibtex
 @misc{chameleonteam2024chameleonmixedmodalearlyfusionfoundation,
