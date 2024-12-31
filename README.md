@@ -11,7 +11,7 @@
 [**About**](#about) | [**Demo**](#demo) | [**Progress**](#progress) | [**Data Pipeline**](#synthetic-generation) | [**Training**](#training-with-torchtune) | [**Ichigo-Whisper**](#ichigo-whisper)
 
 
-  <img src="images/whisperichigo.jpg" width="400"/>
+  <img src="images/ichigov0.2.jpeg" width="400"/>
   <p><small>Homebrewed early-fusion speech model and ASR model</a></small></p>
 </div>
 
