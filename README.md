@@ -1,6 +1,6 @@
 <div align="center">
 
-# :strawberry: Ichigo and 🍰 Ichigo-Whisper.
+# :strawberry: Ichigo-LLM and 🍰 Ichigo-ASR.
 <a href='https://homebrew.ltd/blog/llama3-just-got-ears'><img src='https://img.shields.io/badge/Project-Blog-Green'></a>
 <a href='https://ichigo.homebrew.ltd/'><img src='https://img.shields.io/badge/Project-Demo-violet'></a>
 <a href='https://arxiv.org/pdf/2410.15316'><img src='https://img.shields.io/badge/Paper-Arxiv-red'></a>
