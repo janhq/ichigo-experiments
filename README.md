@@ -1,8 +1,12 @@
 # pip install ichigo
 
-## Get Started 
+## PyPI
 
-### PyPI
+<!-- 
+python -m build
+pip install dist/ichigo-0.0.1-py3-none-any.whl
+python -c "import ichigo.asr as asr; print(asr.__file__)" 
+-->
 
 0. Setup package with `python=3.10`
 
