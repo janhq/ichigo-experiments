@@ -154,3 +154,4 @@ checkpoints/
 vq_stoks/
 concatenated_dataset/
 .gradio/
+test/
