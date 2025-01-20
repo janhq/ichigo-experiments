@@ -155,3 +155,5 @@ vq_stoks/
 concatenated_dataset/
 .gradio/
 test/
+speech.wav
+transcript.txt

@@ -6,9 +6,10 @@
 python -m build
 pip install dist/ichigo-0.0.1-py3-none-any.whl
 python -c "import ichigo.asr as asr; print(asr.__file__)" 
+python -c "from ichigo.asr import transcribe; text = transcribe('speech.wav', 'transcript.txt'); print(text)"
 -->
 
-0. Setup package with `python=3.10`
+1. Setup package with `python=3.10`
 
 ```
 python -m build
@@ -27,22 +28,13 @@ pip install ichigo
 2. Transcribe with your audio
 
 ```python
-import torch, torchaudio
-from ichigo.asr.inference.utils import load_model
+# Quick one-liner
+from ichigo.asr import transcribe
+text = transcribe("speech.wav", "transcript.txt")
 
-# Load Ichigo Whisper
-ichigo_model = load_model(
-        ref="homebrewltd/ichigo-whisper:merge-medium-vi-2d-2560c-dim64.pth",
-        size="merge-medium-vi-2d-2560c-dim64",
-)
-device = "cuda" if torch.cuda.is_available() else "cpu"
-ichigo_model.ensure_whisper(device)
-ichigo_model.to(device)
-
-# Inference
-wav, sr = torchaudio.load("path/to/your/audio")
-if sr != 16000:
-   wav = torchaudio.functional.resample(wav, sr, 16000)
-transcribe = ichigo_model.inference(wav.to(device))
-print(transcribe[0].text)
+# Or with more control
+from ichigo.asr import IchigoASR
+model = IchigoASR(model_name="custom-model", model_path="path/to/model")
+text = model.transcribe("speech.wav")
+print(text)
 ```
