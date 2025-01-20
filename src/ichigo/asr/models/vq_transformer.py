@@ -8,9 +8,9 @@ import whisper
 from huggingface_hub import hf_hub_download
 from vector_quantize_pytorch import ResidualVQ
 
-from ichigo_whisper.data.utils import get_tokenizer
-from ichigo_whisper.models.layers import ResidualAttentionBlock
-from ichigo_whisper.models.modules import LayerNorm
+from ichigo.asr.data.utils import get_tokenizer
+from ichigo.asr.models.layers import ResidualAttentionBlock
+from ichigo.asr.models.modules import LayerNorm
 
 
 class RQBottleneckTransformer(nn.Module):

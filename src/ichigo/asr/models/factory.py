@@ -1,5 +1,5 @@
-from ichigo_whisper.config.vq_config import VQConfig
-from ichigo_whisper.models.vq_transformer import RQBottleneckTransformer
+from ichigo.asr.config.vq_config import VQConfig
+from ichigo.asr.models.vq_transformer import RQBottleneckTransformer
 
 
 def make_vq_model(
