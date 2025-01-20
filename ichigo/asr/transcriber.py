@@ -1,3 +1,4 @@
+import time
 import warnings
 from pathlib import Path
 from typing import Dict, Optional, Set, Union
@@ -33,20 +34,33 @@ class IchigoASR:
         self, audio_path: Union[str, Path], output_path: Optional[str] = None
     ) -> str:
         """Transcribe audio file and optionally save to text file"""
+        start_time = time.time()
+
         # Load and preprocess audio
         wav, sr = torchaudio.load(str(audio_path))
         wav = self.preprocess(wav, sr)
 
+        # Get audio duration in seconds
+        duration = wav.shape[1] / 16000  # 16kHz sampling rate
+
         # Get transcription
         result = self.model.inference(wav)
         transcript = result[0].text
+
+        # Calculate processing speed
+        process_time = time.time() - start_time
+        rtf = process_time / duration if duration > 0 else 0
 
         # Save if output path provided
         if output_path:
             with open(output_path, "w", encoding="utf-8") as f:
                 f.write(transcript)
 
-        return transcript
+        return transcript, {
+            "duration": duration,
+            "process_time": process_time,
+            "rtf": rtf,
+        }
 
     def transcribe_folder(
         self,
