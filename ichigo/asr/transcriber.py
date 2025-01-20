@@ -1,7 +1,9 @@
+import warnings
 from pathlib import Path
+from typing import Dict, Optional, Set, Union
+
 import torch
 import torchaudio
-from typing import Optional, Union
 
 from .utils import load_model
 
@@ -45,3 +47,80 @@ class IchigoASR:
                 f.write(transcript)
 
         return transcript
+
+    def transcribe_folder(
+        self,
+        input_folder: Union[str, Path],
+        output_folder: Optional[Union[str, Path]] = None,
+        extensions: tuple = (".wav", ".mp3", ".flac"),
+    ) -> Dict[str, str]:
+        """Transcribe all audio files in a folder.
+
+        Args:
+            input_folder: Path to folder containing audio files
+            output_folder: Path to save transcripts (defaults to 'transcripts' subfolder)
+            extensions: Tuple of valid audio file extensions to process
+
+        Returns:
+            Dictionary mapping filenames to their transcripts
+        """
+        input_folder = Path(input_folder)
+        if output_folder is None:
+            output_folder = input_folder / "transcripts"
+        output_folder = Path(output_folder)
+        output_folder.mkdir(exist_ok=True, parents=True)
+
+        # Track files for reporting
+        audio_files: Set[Path] = set()
+        non_audio_files: Set[Path] = set()
+
+        # Categorize files
+        for file_path in input_folder.iterdir():
+            if file_path.is_file():
+                if file_path.suffix.lower() in extensions:
+                    audio_files.add(file_path)
+                else:
+                    non_audio_files.add(file_path)
+
+        # Warn about non-audio files
+        if non_audio_files:
+            warnings.warn(
+                f"Found {len(non_audio_files)} non-audio files that will be skipped:\n"
+                f"{', '.join(f.name for f in non_audio_files)}"
+            )
+
+        # Warn if no audio files found
+        if not audio_files:
+            warnings.warn(
+                f"No audio files found with extensions {extensions} in {input_folder}"
+            )
+            return {}
+
+        # Process audio files
+        results = {}
+        for audio_file in sorted(audio_files):  # Sort for consistent processing order
+            output_path = output_folder / f"{audio_file.stem}.txt"
+
+            try:
+                transcript = self.transcribe(audio_file, str(output_path))
+                results[audio_file.name] = transcript
+                print(f"Successfully transcribed: {audio_file.name}")
+
+            except Exception as e:
+                error_msg = f"Error processing {audio_file.name}: {str(e)}"
+                print(f"ERROR: {error_msg}")
+                results[audio_file.name] = f"ERROR: {error_msg}"
+
+        # Print summary
+        print(f"\nTranscription Summary:")
+        print(f"- Total files in directory: {len(non_audio_files) + len(audio_files)}")
+        print(f"- Audio files processed: {len(audio_files)}")
+        print(f"- Non-audio files skipped: {len(non_audio_files)}")
+        print(
+            f"- Successful transcriptions: {sum(1 for v in results.values() if not v.startswith('ERROR'))}"
+        )
+        print(
+            f"- Failed transcriptions: {sum(1 for v in results.values() if v.startswith('ERROR'))}"
+        )
+
+        return results
