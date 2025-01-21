@@ -37,16 +37,9 @@ dependencies = [
 ]
 
 [tool.setuptools]
-package-dir = {"" = "src"}
+package-dir = {"" = "ichigo"}
 packages = [
-    "ichigo",
-    "ichigo.asr",
-    "ichigo.llm",
-    "ichigo.tts",
-    "ichigo.asr.config",
-    "ichigo.asr.data",
-    "ichigo.asr.demo",
-    "ichigo.asr.models",
-    "ichigo.asr.trainer",
-    "ichigo.asr.utils"
+    "asr",
+    "llm",
+    "tts",
 ]
