@@ -23,13 +23,15 @@ class IchigoASR:
         self,
         model_name: str = "merge-medium-vi-2d-2560c-dim64",
         model_path: str = "homebrewltd/ichigo-whisper:merge-medium-vi-2d-2560c-dim64.pth",
-        device: Optional[str] = None,
+        return_stoks: bool = False,
     ):
         self.model_name = model_name
-        self.device = device or ("cuda" if torch.cuda.is_available() else "cpu")
+        self.device = "cuda" if torch.cuda.is_available() else "cpu"
+        self.return_stoks = return_stoks
 
-        # Load and initialize model
-        self.model = load_model(ref=model_path, size=model_name)
+        self.model = load_model(
+            ref=model_path, size=model_name, return_stoks=return_stoks
+        )
         self.model.ensure_whisper(self.device)
         self.model.to(self.device)
 
@@ -68,7 +70,11 @@ class IchigoASR:
             wav = self.preprocess(wav, sr)
             duration = wav.shape[1] / 16000
 
-            result = self.model.inference(wav)
+            result = self.model.inference(wav, return_stoks=self.return_stoks)
+
+            if self.return_stoks:
+                return result
+
             transcript = result[0].text
 
             process_time = time.time() - start_time
@@ -122,21 +128,16 @@ class IchigoASR:
             with open(output_path, "w", encoding="utf-8") as f:
                 for audio_file in sorted(audio_files):
                     try:
-                        transcript, _ = self.transcribe(
-                            audio_file, None
-                        )  # Don't create individual files
+                        transcript, _ = self.transcribe(audio_file, None)
                         results[audio_file.name] = transcript
-                        # Write to the transcription file with proper formatting
                         f.write(f"{audio_file.name}\t{transcript}\n")
                         print(f"Successfully transcribed: {audio_file.name}")
                     except Exception as e:
                         error_msg = f"Error processing {audio_file.name}: {str(e)}"
                         print(f"ERROR: {error_msg}")
                         results[audio_file.name] = f"ERROR: {error_msg}"
-                        # Write errors to the transcription file as well
                         f.write(f"{audio_file.name}\tERROR: {error_msg}\n")
 
-            # Print summary
             success = sum(1 for v in results.values() if not v.startswith("ERROR"))
             failed = sum(1 for v in results.values() if v.startswith("ERROR"))
             print(f"\nTranscription Summary:")

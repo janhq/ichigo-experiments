@@ -7,6 +7,7 @@ def make_vq_model(
     no_quantize=False,
     config: VQConfig = VQConfig(),
     dataset=None,
+    return_stoks=None,
 ):
     common = dict(
         q_depth=1,
@@ -15,6 +16,7 @@ def make_vq_model(
         use_cosine_sim=True,
         config=config,
         no_quantize=no_quantize,
+        return_stoks=return_stoks,
     )
 
     model_configs = {
