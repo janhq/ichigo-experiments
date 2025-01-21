@@ -1,4 +1,5 @@
 from ichigo.asr.transcriber import IchigoASR
+from typing import Union
 
 _default_model = None
 
@@ -11,18 +12,12 @@ def get_model(**kwargs) -> IchigoASR:
     return _default_model
 
 
-def transcribe(audio_path: str, output_path: str = None, **kwargs) -> str:
-    """Quick transcription function using default model"""
-    model = get_model(**kwargs)
-    return model.transcribe(audio_path, output_path)
-
-
-def transcribe_folder(
-    input_folder: str,
-    output_folder: str = None,
+def transcribe(
+    input_path: str,
+    output_path: str = None,
     extensions: tuple = (".wav", ".mp3", ".flac"),
     **kwargs,
-) -> dict[str, str]:
-    """Quick folder transcription function using default model"""
+) -> Union[str, dict[str, str]]:
+    """Quick transcription function using default model for file or folder"""
     model = get_model(**kwargs)
-    return model.transcribe_folder(input_folder, output_folder, extensions)
+    return model.transcribe(input_path, output_path, extensions)

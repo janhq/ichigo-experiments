@@ -14,6 +14,7 @@ def load_model(
     filename=None,
     local_dir=None,
     local_filename=None,
+    return_stoks=False,
 ):
     """Load model from file or Hugging Face Hub.
 
@@ -46,7 +47,7 @@ def load_model(
         k.replace("model.", ""): v for k, v in spec["state_dict"].items()
     }
     vq_config = VQConfig()
-    ichigo_model = make_vq_model(size=size, config=vq_config)
+    ichigo_model = make_vq_model(size=size, config=vq_config, return_stoks=return_stoks)
     ichigo_model.load_state_dict(model_state_dict)
     ichigo_model.eval()
     return ichigo_model

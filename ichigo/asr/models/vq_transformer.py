@@ -63,6 +63,7 @@ class RQBottleneckTransformer(nn.Module):
         no_quantize=False,
         whisper_model_name="tiny.en",
         config=None,
+        return_stoks=False,
     ):
         super().__init__()
         self._init_attributes(locals())
@@ -381,14 +382,17 @@ class RQBottleneckTransformer(nn.Module):
 
         return self.ln_post(self.out_blocks(x))
 
-    def inference(self, samples):
+    def inference(self, samples, return_stoks):
         """Perform inference on input samples"""
 
         # Quantize and Dequantize
         stoks = self.quantize(samples)
         dequantize_embed = self.dequantize(stoks).to(self.whmodel[0].device)
-        # Decode text
-        return self.whmodel[0].decode(dequantize_embed, self.decoding_options)
+
+        if return_stoks:
+            return stoks
+        else:
+            return self.whmodel[0].decode(dequantize_embed, self.decoding_options)
 
     @torch.no_grad()
     def extract_teacher(self, samples, input_toks, output_toks):
