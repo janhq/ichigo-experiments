@@ -2,6 +2,7 @@ import os
 import tempfile
 from pathlib import Path
 
+import torch
 from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.responses import JSONResponse
 
@@ -37,7 +38,11 @@ async def transcribe_audio(file: UploadFile = File(...), return_stoks: bool = Fa
         result = transcribe(tmp_path, output_path=None, return_stoks=return_stoks)
 
         if return_stoks:
-            response = {"semantic_tokens": result}
+            response = {
+                "semantic_tokens": (
+                    result.tolist() if torch.is_tensor(result) else result
+                )
+            }
         else:
             transcript, metadata = result
             response = {"transcript": transcript, **metadata}
