@@ -21,10 +21,8 @@ from whisperspeech.vq_stoks import RQBottleneckTransformer
 from ichigo.asr.utils import load_model
 from ichigo.llm.utils import convert_ids_to_tokens
 
-from .base import VoiceAssistant
 
-
-class IchigoAssistant(VoiceAssistant):
+class IchigoAssistant:
     def __init__(self, use_speechless=False):
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
 
