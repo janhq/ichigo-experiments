@@ -154,7 +154,6 @@ checkpoints/
 vq_stoks/
 concatenated_dataset/
 .gradio/
-test/
 cache/
 speech.wav
 transcript.txt
