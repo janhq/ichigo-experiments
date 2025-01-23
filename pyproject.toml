@@ -14,27 +14,17 @@ requires-python = ">=3.10"
 license = {text = "Apache-2.0"}
 keywords = ["asr", "llm", "tts", "ichigo"]
 dependencies = [
-    "datasets==3.1.0",
     "huggingface_hub==0.26.2",
-    "lightning==2.4.0",
     "openai_whisper==20240930",
     "torch==2.5.1",
     "torchaudio==2.5.1",
     "vector_quantize_pytorch==1.6.22",
-    "webdataset==0.2.85",
-    "wandb>=0.12.10",
-    "librosa",
-    "soundfile",
-    "black",
-    "evaluate",
     "transformers",
-    "jiwer",
-    "gradio",
-    "matplotlib",
-    "seaborn",
     "build",
     "twine",
     "fastapi",
+    "whisperspeech",
+    "accelerate>=0.26.0"
 ]
 
 [tool.setuptools]
