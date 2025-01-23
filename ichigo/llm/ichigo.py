@@ -10,6 +10,7 @@ warnings.filterwarnings(
 )
 
 import torch
+import torchaudio
 from huggingface_hub import hf_hub_download
 from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
 from whisperspeech.vq_stoks import RQBottleneckTransformer
@@ -45,6 +46,11 @@ class IchigoAssistant(VoiceAssistant):
         self.pipe = pipeline("text-generation", model=model, tokenizer=tokenizer)
 
     def audio_to_sound_tokens(self, wav, sr, device="cuda"):
+        if sr != 16000:
+            wav = torchaudio.functional.resample(wav, sr, 16000)
+
+        wav = wav.half()
+
         with torch.no_grad():
             codes = self.vq_model.encode_audio(wav.to(device))
             codes = codes[0].cpu().tolist()
@@ -57,9 +63,13 @@ class IchigoAssistant(VoiceAssistant):
         audio,
         max_new_tokens=2048,
     ):
-        sound_tokens = self.audio_to_sound_tokens(
-            audio["array"].unsqueeze(0), audio["sampling_rate"]
-        )
+        if isinstance(audio, str):
+            wav, sr = torchaudio.load(audio)
+        else:
+            wav = audio["array"].unsqueeze(0)
+            sr = audio["sampling_rate"]
+
+        sound_tokens = self.audio_to_sound_tokens(wav, sr)
 
         messages = [
             {"role": "user", "content": sound_tokens},

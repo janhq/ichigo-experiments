@@ -77,6 +77,7 @@ You can also access the API documentation at `http://localhost:8000/docs`
 
 ## LLMs
 
+### Python Usage
 ```python
 # Quick one-liner for audio processing
 from ichigo.llm import process_audio
@@ -86,7 +87,28 @@ response = process_audio("path/to/audio.wav")
 from ichigo.llm import IchigoAssistant
 assistant = IchigoAssistant()
 response = assistant.generate_audio(
-    audio_dict,
+    "path/to/audio.wav",
     max_new_tokens=2048
 )
 ```
+
+### API
+
+```bash
+# Start the API server
+uvicorn ichigo.llm.server:app --host 0.0.0.0 --port 8001
+
+# Use with curl
+curl -X POST "http://localhost:8001/chat/" \
+  -H "accept: application/json" \
+  -H "Content-Type: multipart/form-data" \
+  -F "file=@path/to/audio.wav"
+
+# With custom max_new_tokens
+curl -X POST "http://localhost:8001/process/?max_new_tokens=1024" \
+  -H "accept: application/json" \
+  -H "Content-Type: multipart/form-data" \
+  -F "file=@path/to/audio.wav"
+```
+
+You can also access the API documentation at `http://localhost:8001/docs`
