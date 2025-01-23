@@ -29,7 +29,7 @@ pip install ichigo
 
 ### Batch Processing
 
-1. Transcribe with your audio file
+Transcribe with your audio file
 
 ```python
 # Quick one-liner
@@ -44,13 +44,6 @@ results = model.transcribe(
     output_path="./output_folder",
     extensions=(".wav", ".mp3", ".flac", ".m4a")
 )
-```
-
-3. Return semantic tokens for further speechless training (Optional)
-
-```python
-from ichigo.asr import transcribe
-stoks = transcribe("path/to/your/file/or/folder", return_stoks=True)
 ```
 
 ### API
