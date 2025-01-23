@@ -6,29 +6,30 @@
 python -m build
 pip install dist/ichigo-0.0.1-py3-none-any.whl
 python -c "import ichigo.asr as asr; print(asr.__file__)" 
+python -c "from ichigo.llm import process_audio; response = process_audio('speech.wav'); print(response)"
 python -c "from ichigo.asr import transcribe; results = transcribe('speech.wav'); print(results)"
 python -c "from ichigo.asr import transcribe; results = transcribe('speech.wav', return_stoks=True); print(results)"
 python -c "from ichigo.asr import transcribe; results = transcribe('/root/ichigo-experiments/test'); print(results)"
 -->
 
-Setup package with `python=3.10`
+1. Setup package with `python=3.10` (dev)
 
 ```
 python -m build
 python -m twine upload dist/* 
-
-# test
-python -c "import ichigo.asr as asr; print(asr.__file__)"
 ```
 
-### Batch Processing
-1. Install python package
+2. Install python package
 
 ```bash
 pip install ichigo
 ```
 
-2. Transcribe with your audio file
+## ASR
+
+### Batch Processing
+
+1. Transcribe with your audio file
 
 ```python
 # Quick one-liner
@@ -72,3 +73,42 @@ curl -X POST "http://localhost:8000/transcribe/?return_stoks=true" \
 ```
 
 You can also access the API documentation at `http://localhost:8000/docs`
+
+
+## LLMs
+
+### Python Usage
+```python
+# Quick one-liner for audio processing
+from ichigo.llm import process_audio
+response = process_audio("path/to/audio.wav")
+
+# Or with more control using the assistant class
+from ichigo.llm import IchigoAssistant
+assistant = IchigoAssistant()
+response = assistant.generate_audio(
+    "path/to/audio.wav",
+    max_new_tokens=2048
+)
+```
+
+### API
+
+```bash
+# Start the API server
+uvicorn ichigo.llm.server:app --host 0.0.0.0 --port 8001
+
+# Use with curl
+curl -X POST "http://localhost:8001/chat/" \
+  -H "accept: application/json" \
+  -H "Content-Type: multipart/form-data" \
+  -F "file=@path/to/audio.wav"
+
+# With custom max_new_tokens
+curl -X POST "http://localhost:8001/process/?max_new_tokens=1024" \
+  -H "accept: application/json" \
+  -H "Content-Type: multipart/form-data" \
+  -F "file=@path/to/audio.wav"
+```
+
+You can also access the API documentation at `http://localhost:8001/docs`
