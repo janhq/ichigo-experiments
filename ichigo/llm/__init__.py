@@ -14,4 +14,4 @@ def get_assistant(**kwargs) -> IchigoAssistant:
 def process_audio(audio_input, max_new_tokens: int = 2048, **kwargs) -> str:
     """Quick audio processing function using default assistant"""
     assistant = get_assistant(**kwargs)
-    return assistant.generate_audio(audio_input, max_new_tokens=max_new_tokens)
+    return assistant.generate_text(audio_input, max_new_tokens=max_new_tokens)
