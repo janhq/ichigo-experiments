@@ -2,6 +2,7 @@ import time
 import warnings
 from pathlib import Path
 from typing import Dict, Optional, Union
+import torch.nn as nn
 
 warnings.filterwarnings(
     "ignore", category=FutureWarning, module="vector_quantize_pytorch"
@@ -24,7 +25,7 @@ import torch
 import yaml
 
 
-class BaseASRModel(ABC):
+class BaseASRModel(nn.module):
     def __init__(self, config_path: str):
         with open(config_path, 'r') as file:
             config = yaml.safe_load(file)
