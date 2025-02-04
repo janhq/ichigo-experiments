@@ -6,10 +6,10 @@
 python -m build
 pip install dist/ichigo-0.0.1-py3-none-any.whl
 python -c "import ichigo.asr as asr; print(asr.__file__)" 
-python -c "from ichigo.llm import process_audio; response = process_audio('speech.wav'); print(response)"
 python -c "from ichigo.asr import transcribe; results = transcribe('speech.wav'); print(results)"
 python -c "from ichigo.asr import transcribe; results = transcribe('speech.wav', return_stoks=True); print(results)"
 python -c "from ichigo.asr import transcribe; results = transcribe('/root/ichigo-experiments/test'); print(results)"
+python -c "from ichigo.llm import process_audio; response = process_audio('speech.wav'); print(response)"
 -->
 
 1. Setup package with `python=3.10` (dev)
@@ -38,7 +38,7 @@ results = transcribe("path/to/file/or/folder")
 
 # Or with more control using the model class
 from ichigo.asr import IchigoASR
-model = IchigoASR(model_name="custom-model", model_path="path/to/model/hub")
+model = IchigoASR(config="config-name")
 results = model.transcribe(
     "path/to/file/or/folder",
     output_path="./output_folder",
