@@ -67,6 +67,8 @@ class IchigoASR:
 
             start_time = time.time()
             wav, sr = torchaudio.load(str(input_path))
+            if wav.shape[0] > 1:
+                wav = wav.mean(0, keepdim=True)
             wav = self.preprocess(wav, sr)
             duration = wav.shape[1] / 16000
 

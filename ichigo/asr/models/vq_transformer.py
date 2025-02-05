@@ -354,7 +354,7 @@ class RQBottleneckTransformer(nn.Module):
 
         # Dequantize
         assert self.q_depth == 1
-        assert len(stoks.shape) == 1, "batch processing is not supported"
+        assert len(stoks.shape) == 1, f"batch processing is not supported. received {stoks.shape=}"
 
         # padding = torch.nonzero(stoks == self.vq_codes)
         # if padding.any():
@@ -387,11 +387,11 @@ class RQBottleneckTransformer(nn.Module):
 
         # Quantize and Dequantize
         stoks = self.quantize(samples)
-        dequantize_embed = self.dequantize(stoks).to(self.whmodel[0].device)
 
         if return_stoks:
             return stoks
         else:
+            dequantize_embed = self.dequantize(stoks).to(self.whmodel[0].device)
             return self.whmodel[0].decode(dequantize_embed, self.decoding_options)
 
     @torch.no_grad()
