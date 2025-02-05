@@ -87,4 +87,4 @@ async def _(req: R2TRequest):
     embeds = model.dequantize(token_ids)
     output = model.whmodel[0].decode(embeds, model.decoding_options)[0].text
 
-    return dict(output=output)
+    return dict(text=output)
