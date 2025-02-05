@@ -29,7 +29,6 @@ class Quantizer(nn.Module):
         self.use_cosine_sim = qconfig["use_cosine_sim"]
         self.codebook_decay = qconfig["codebook_decay"]
         self.commitment_weight = qconfig["commitment_weight"]
-        self.return_stoks = qconfig["return_stoks"]
         self.query_mult = qconfig["query_mult"]
         self.q_depth = qconfig["q_depth"]
 
@@ -150,7 +149,11 @@ class Quantizer(nn.Module):
 
         return self.ln_post(self.out_blocks(x))
 
-    def forward(self, embs, n_frames):
+    def forward(self, embs, n_frames, return_stoks=False):
         stoks = self.quantize(embs, n_frames)
-        dequantize_embed = self.dequantize(stoks)
-        return dequantize_embed
+
+        if return_stoks:
+            return stoks
+        else:
+            dequantize_embed = self.dequantize(stoks)
+            return dequantize_embed

@@ -31,8 +31,6 @@ quantizer:
   downsample_conv: False
   downsample_mean: True
 
-  return_stoks: False
-
 r2t:
   decoding_options:
     task: "transcribe"

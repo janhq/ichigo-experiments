@@ -51,8 +51,6 @@ class IchigoASR:
 
         model_path = f"{self.config['model_hub']}:{self.config['model_name']}.pth"
 
-        self.return_stoks = self.config["quantizer"]["return_stoks"]
-
         self.s2r = Speech2Rep(self.config)
         self.quantizer = load_quantizer(ref=model_path, config=self.config)
         self.r2t = Rep2Text(self.config)
@@ -66,6 +64,16 @@ class IchigoASR:
         if sample_rate != 16000:
             audio = torchaudio.functional.resample(audio, sample_rate, 16000)
         return audio.to(self.device)
+
+    def get_stoks(self, input_path: Union[str, Path]):
+        """Support return stoks for a single file"""
+        input_path = Path(input_path)
+        wav, sr = torchaudio.load(str(input_path))
+        wav = self.preprocess(wav, sr)
+
+        embs, n_frames = self.s2r(wav)
+        stoks = self.quantizer(embs, n_frames, return_stoks=True)
+        return stoks
 
     def transcribe(
         self,
@@ -93,6 +101,8 @@ class IchigoASR:
 
             start_time = time.time()
             wav, sr = torchaudio.load(str(input_path))
+            if wav.shape[0] > 1:
+                wav = wav.mean(0, keepdim=True)
             wav = self.preprocess(wav, sr)
             duration = wav.shape[1] / 16000
 
