@@ -7,12 +7,13 @@ import torchaudio
 from fastapi import FastAPI, File, UploadFile, Form
 from pydantic import BaseModel
 
-from ichigo.asr import get_model
+from ichigo.asr import get_model, release_model
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     get_model()  # load model to GPU at startup
+    release_model()
     yield
 
 
@@ -29,7 +30,7 @@ class TranscriptionsModelName(str, Enum):
 
 
 @app.post("/v1/audio/transcriptions")
-async def transcribe_audio(
+def _(
     file: Annotated[UploadFile, File()],
     model: Annotated[TranscriptionsModelName, Form()],
 ):
@@ -50,11 +51,12 @@ async def transcribe_audio(
     token_ids = model_.model.quantize(wav)
     embeds = model_.model.dequantize(token_ids)
     output = model_.model.whmodel[0].decode(embeds, model_.model.decoding_options)[0].text
+    release_model()
     return dict(text=output)
 
 
 @app.post("/s2r")
-async def _(file: UploadFile = File(...)):
+def _(file: UploadFile = File(...)):
     model = get_model()
     wav, sr = torchaudio.load(file.file)
 
@@ -64,6 +66,7 @@ async def _(file: UploadFile = File(...)):
     wav = model.preprocess(wav, sr)
 
     token_ids = model.model.quantize(wav).squeeze(0).tolist()
+    release_model()
 
     output = ''.join(f"<|sound_{tok:04d}|>" for tok in token_ids)
     output = f"<|sound_start|>{output}<|sound_end|>"
@@ -76,7 +79,7 @@ class R2TRequest(BaseModel):
 
 
 @app.post("/r2t")
-async def _(req: R2TRequest):
+def _(req: R2TRequest):
     """tokens will have format <|sound_start|><|sound_0000|><|sound_end|>
     """
     token_ids = [int(x) for x in req.tokens.split("|><|sound_")[1:-1]]
@@ -86,5 +89,6 @@ async def _(req: R2TRequest):
     token_ids = token_ids.to(model.device)
     embeds = model.dequantize(token_ids)
     output = model.whmodel[0].decode(embeds, model.decoding_options)[0].text
+    release_model()
 
     return dict(text=output)
