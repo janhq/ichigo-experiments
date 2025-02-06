@@ -1,5 +1,6 @@
 from contextlib import asynccontextmanager
 from enum import Enum
+import threading
 from typing import Annotated
 
 import torch
@@ -7,14 +8,16 @@ import torchaudio
 from fastapi import FastAPI, File, UploadFile, Form
 from pydantic import BaseModel
 
-from ichigo.asr import get_model, release_model
+from ichigo.asr import get_model
+
+
+MODEL_LOCK = threading.Lock()
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # load model to GPU at startup
     get_model()
-    release_model()
     yield
 
 
@@ -46,13 +49,14 @@ def _(
         wav = wav.mean(0, keepdim=True)
 
     model_ = get_model()
+    MODEL_LOCK.acquire()
     wav = model_.preprocess(wav, sr)
 
     with torch.no_grad():
         embs, n_frames = model_.s2r(wav)
         dequantize_embed = model_.quantizer(embs, n_frames)
         output = model_.r2t(dequantize_embed)[0].text
-    release_model()
+    MODEL_LOCK.release()
 
     return dict(text=output)
 
@@ -64,11 +68,12 @@ def _(file: UploadFile = File(...)):
         wav = wav.mean(0, keepdim=True)
 
     model = get_model()
+    MODEL_LOCK.acquire()
     with torch.no_grad():
         wav = model.preprocess(wav, sr)
         embs, n_frames = model.s2r(wav)
         token_ids = model.quantizer.quantize(embs, n_frames).squeeze(0).tolist()
-    release_model()
+    MODEL_LOCK.release()
 
     output = ''.join(f"<|sound_{tok:04d}|>" for tok in token_ids)
     output = f"<|sound_start|>{output}<|sound_end|>"
@@ -88,10 +93,11 @@ def _(req: R2TRequest):
     token_ids = torch.tensor(token_ids).unsqueeze(0)
 
     model = get_model()
+    MODEL_LOCK.acquire()
     with torch.no_grad():
         token_ids = token_ids.to(model.device)
         embeds = model.quantizer.dequantize(token_ids)
         output = model.r2t(embeds)[0].text
-    release_model()
+    MODEL_LOCK.release()
 
     return dict(text=output)

@@ -1,24 +1,17 @@
 from typing import Union
-import threading
 
 import torch
 
 from ichigo.asr.transcriber import IchigoASR
 
 _default_model = None
-_lock = threading.Lock()
 
 def get_model(**kwargs) -> IchigoASR:
     """Get or create default ASR model instance"""
     global _default_model
     if _default_model is None:
         _default_model = IchigoASR(**kwargs)
-    _lock.acquire()
     return _default_model
-
-
-def release_model():
-    _lock.release()
 
 
 def transcribe(
