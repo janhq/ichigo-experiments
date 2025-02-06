@@ -12,7 +12,8 @@ from ichigo.asr import get_model, release_model
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    get_model()  # load model to GPU at startup
+    # load model to GPU at startup
+    get_model()
     release_model()
     yield
 
@@ -40,12 +41,11 @@ def _(
     Args:
         file: Audio file to transcribe
     """
-    model_ = get_model()
     wav, sr = torchaudio.load(file.file)
-
-    # convert multi-channel audio to mono
-    if wav.shape[0] > 1:
+    if wav.shape[0] > 1:  # convert multi-channel audio to mono
         wav = wav.mean(0, keepdim=True)
+
+    model_ = get_model()
     wav = model_.preprocess(wav, sr)
 
     token_ids = model_.model.quantize(wav)
@@ -57,14 +57,12 @@ def _(
 
 @app.post("/s2r")
 def _(file: UploadFile = File(...)):
-    model = get_model()
     wav, sr = torchaudio.load(file.file)
-
-    # convert multi-channel audio to mono
-    if wav.shape[0] > 1:
+    if wav.shape[0] > 1:  # convert multi-channel audio to mono
         wav = wav.mean(0, keepdim=True)
-    wav = model.preprocess(wav, sr)
 
+    model = get_model()
+    wav = model.preprocess(wav, sr)
     token_ids = model.model.quantize(wav).squeeze(0).tolist()
     release_model()
 
