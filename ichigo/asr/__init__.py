@@ -1,6 +1,9 @@
-from ichigo.asr.transcriber import IchigoASR
 from typing import Union
 import threading
+
+import torch
+
+from ichigo.asr.transcriber import IchigoASR
 
 _default_model = None
 _lock = threading.Lock()
@@ -27,3 +30,9 @@ def transcribe(
     """Quick transcription function using default model for file or folder"""
     model = get_model(**kwargs)
     return model.transcribe(input_path, output_path, extensions)
+
+
+def get_stoks(input_path: str, **kwargs) -> torch.Tensor:
+    """Get STOKS for a single file using default model"""
+    model = get_model(**kwargs)
+    return model.get_stoks(input_path)
