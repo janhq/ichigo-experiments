@@ -10,36 +10,70 @@ warnings.filterwarnings("ignore", category=FutureWarning, module="whisper")
 warnings.filterwarnings(
     "ignore", category=FutureWarning, message="You are using `torch.load`"
 )
-
-
 import torch
 import torchaudio
+import yaml
+from huggingface_hub import hf_hub_download
 
-from .utils import load_model
+from ichigo.asr.arch.quantizer import Quantizer
+from ichigo.asr.arch.r2t import Rep2Text
+from ichigo.asr.arch.s2r import Speech2Rep
+
+
+def load_quantizer(ref, config):
+    if ":" in ref:
+        repo_id, filename = ref.split(":", 1)
+        local_filename = hf_hub_download(repo_id=repo_id, filename=filename)
+    else:
+        local_filename = ref
+
+    spec = torch.load(local_filename)
+    model_state_dict = {
+        k.replace("model.", ""): v for k, v in spec["state_dict"].items()
+    }
+
+    quantizer = Quantizer(config)
+    quantizer.load_state_dict(model_state_dict, strict=False)
+    quantizer.eval()
+
+    return quantizer
 
 
 class IchigoASR:
     def __init__(
         self,
-        model_name: str = "merge-medium-vi-2d-2560c-dim64",
-        model_path: str = "homebrewltd/ichigo-whisper:merge-medium-vi-2d-2560c-dim64.pth",
-        return_stoks: bool = False,
+        config: str = "merge-2560d",
     ):
-        self.model_name = model_name
-        self.device = "cuda" if torch.cuda.is_available() else "cpu"
-        self.return_stoks = return_stoks
+        # Load config
+        config_path = Path(__file__).parent / "config" / f"{config}.yaml"
+        with open(config_path) as f:
+            self.config = yaml.safe_load(f)
 
-        self.model = load_model(
-            ref=model_path, size=model_name, return_stoks=return_stoks
-        )
-        self.model.ensure_whisper(self.device)
-        self.model.to(self.device)
+        model_path = f"{self.config['model_hub']}:{self.config['model_name']}.pth"
+
+        self.s2r = Speech2Rep(self.config)
+        self.quantizer = load_quantizer(ref=model_path, config=self.config)
+        self.r2t = Rep2Text(self.config)
+
+        self.device = "cuda" if torch.cuda.is_available() else "cpu"
+        self.s2r.to(self.device)
+        self.quantizer.to(self.device)
+        self.r2t.to(self.device)
 
     def preprocess(self, audio: torch.Tensor, sample_rate: int) -> torch.Tensor:
-        """Preprocess audio to match model requirements"""
         if sample_rate != 16000:
             audio = torchaudio.functional.resample(audio, sample_rate, 16000)
         return audio.to(self.device)
+
+    def get_stoks(self, input_path: Union[str, Path]):
+        """Support return stoks for a single file"""
+        input_path = Path(input_path)
+        wav, sr = torchaudio.load(str(input_path))
+        wav = self.preprocess(wav, sr)
+
+        embs, n_frames = self.s2r(wav)
+        stoks = self.quantizer(embs, n_frames, return_stoks=True)
+        return stoks
 
     def transcribe(
         self,
@@ -67,14 +101,15 @@ class IchigoASR:
 
             start_time = time.time()
             wav, sr = torchaudio.load(str(input_path))
+            if wav.shape[0] > 1:
+                wav = wav.mean(0, keepdim=True)
             wav = self.preprocess(wav, sr)
             duration = wav.shape[1] / 16000
 
-            result = self.model.inference(wav, return_stoks=self.return_stoks)
-
-            if self.return_stoks:
-                return result
-
+            # ! Inference
+            embs, n_frames = self.s2r(wav)
+            dequantize_embed = self.quantizer(embs, n_frames)
+            result = self.r2t(dequantize_embed)
             transcript = result[0].text
 
             process_time = time.time() - start_time
