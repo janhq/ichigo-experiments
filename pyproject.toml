@@ -32,6 +32,8 @@ package-dir = {"ichigo" = "ichigo"}
 packages = [
     "ichigo",
     "ichigo.asr",
+    "ichigo.asr.arch",
+    "ichigo.asr.config",
     "ichigo.llm",
     "ichigo.tts"
 ]
