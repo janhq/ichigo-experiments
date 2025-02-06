@@ -70,7 +70,7 @@ stoks = model.get_stoks("path/to/file")
 
 ```bash
 # Start the API server
-uvicorn app_asr:app --host 0.0.0.0 --port 8000
+cd api && uvicorn asr:app --host 0.0.0.0 --port 8000
 
 # alternatively, with Docker
 # docker compose -f 'docker-compose.yml' up -d --build 'asr'
@@ -124,4 +124,4 @@ You can also access the API documentation at `http://localhost:8000/docs`
 
 - [torchtune](https://github.com/pytorch/torchtune): The codebase we built upon
 - [WhisperSpeech](https://github.com/collabora/WhisperSpeech): Text-to-speech model for synthetic audio generation
-- [llama3](https://huggingface.co/collections/meta-llama/meta-llama-3-66214712577ca38149ebb2b6): the Family of Models that we based on that has the amazing language capabilitie
+- [llama3](https://huggingface.co/collections/meta-llama/meta-llama-3-66214712577ca38149ebb2b6): the Family of Models that we based on that has the amazing language capabilities

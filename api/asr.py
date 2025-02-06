@@ -75,7 +75,7 @@ def _(file: UploadFile = File(...)):
         token_ids = model.quantizer.quantize(embs, n_frames).squeeze(0).tolist()
     MODEL_LOCK.release()
 
-    output = ''.join(f"<|sound_{tok:04d}|>" for tok in token_ids)
+    output = "".join(f"<|sound_{tok:04d}|>" for tok in token_ids)
     output = f"<|sound_start|>{output}<|sound_end|>"
 
     return dict(tokens=output)
@@ -87,8 +87,7 @@ class R2TRequest(BaseModel):
 
 @app.post("/r2t")
 def _(req: R2TRequest):
-    """tokens will have format <|sound_start|><|sound_0000|><|sound_end|>
-    """
+    """tokens will have format <|sound_start|><|sound_0000|><|sound_end|>"""
     token_ids = [int(x) for x in req.tokens.split("|><|sound_")[1:-1]]
     token_ids = torch.tensor(token_ids).unsqueeze(0)
 
