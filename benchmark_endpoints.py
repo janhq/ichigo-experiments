@@ -3,7 +3,7 @@ import time
 import requests
 
 
-ASR_HOST = "http://192.168.100.111:8000"
+ASR_HOST = "http://localhost:8000"
 
 
 def asr():
