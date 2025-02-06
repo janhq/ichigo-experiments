@@ -28,9 +28,10 @@ dependencies = [
 ]
 
 [tool.setuptools]
-package-dir = {"" = "ichigo"}
+package-dir = {"ichigo" = "ichigo"}
 packages = [
-    "asr",
-    "llm",
-    "tts",
+    "ichigo",
+    "ichigo.asr",
+    "ichigo.llm",
+    "ichigo.tts"
 ]
