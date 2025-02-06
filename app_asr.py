@@ -48,10 +48,12 @@ def _(
     model_ = get_model()
     wav = model_.preprocess(wav, sr)
 
-    token_ids = model_.model.quantize(wav)
-    embeds = model_.model.dequantize(token_ids)
-    output = model_.model.whmodel[0].decode(embeds, model_.model.decoding_options)[0].text
+    with torch.no_grad():
+        embs, n_frames = model_.s2r(wav)
+        dequantize_embed = model_.quantizer(embs, n_frames)
+        output = model_.r2t(dequantize_embed)[0].text
     release_model()
+
     return dict(text=output)
 
 
@@ -62,14 +64,16 @@ def _(file: UploadFile = File(...)):
         wav = wav.mean(0, keepdim=True)
 
     model = get_model()
-    wav = model.preprocess(wav, sr)
-    token_ids = model.model.quantize(wav).squeeze(0).tolist()
+    with torch.no_grad():
+        wav = model.preprocess(wav, sr)
+        embs, n_frames = model.s2r(wav)
+        token_ids = model.quantizer.quantize(embs, n_frames).squeeze(0).tolist()
     release_model()
 
     output = ''.join(f"<|sound_{tok:04d}|>" for tok in token_ids)
     output = f"<|sound_start|>{output}<|sound_end|>"
 
-    return dict(model_name=model.model_name, tokens=output)
+    return dict(tokens=output)
 
 
 class R2TRequest(BaseModel):
@@ -83,10 +87,11 @@ def _(req: R2TRequest):
     token_ids = [int(x) for x in req.tokens.split("|><|sound_")[1:-1]]
     token_ids = torch.tensor(token_ids).unsqueeze(0)
 
-    model = get_model().model
-    token_ids = token_ids.to(model.device)
-    embeds = model.dequantize(token_ids)
-    output = model.whmodel[0].decode(embeds, model.decoding_options)[0].text
+    model = get_model()
+    with torch.no_grad():
+        token_ids = token_ids.to(model.device)
+        embeds = model.quantizer.dequantize(token_ids)
+        output = model.r2t(embeds)[0].text
     release_model()
 
     return dict(text=output)
