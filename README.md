@@ -1,24 +1,6 @@
 # Ichigo Package
 
-## PyPI
-
-<!-- 
-python -m build
-pip install dist/ichigo-0.0.1-py3-none-any.whl
-python -c "import ichigo.asr as asr; print(asr.__file__)" 
-python -c "from ichigo.asr import transcribe; results = transcribe('speech.wav'); print(results)"
-python -c "from ichigo.asr import get_stoks; stoks = get_stoks('speech.wav'); print(stoks)"
-python -c "from ichigo.asr import transcribe; results = transcribe('/root/ichigo-experiments/test'); print(results)"
--->
-
-1. Setup package with `python=3.10` (dev)
-
-```
-python -m build
-python -m twine upload dist/* 
-```
-
-2. Install python package
+## Installation
 
 ```bash
 pip install ichigo
@@ -27,8 +9,6 @@ pip install ichigo
 ## ASR
 
 ### Batch Processing
-
-Transcribe with your audio file
 
 ```python
 # Quick one-liner for transcription
